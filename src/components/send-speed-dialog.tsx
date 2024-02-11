@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
 
 const SendSpeechDialog = ({ transcript }: { transcript: string }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [bullet, setBullet] = useState(false);
   const [text, setText] = useState(false);
   function handleContinue() {

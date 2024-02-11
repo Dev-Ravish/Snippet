@@ -19,7 +19,6 @@ const Navbar = () => {
 
         {userId ? (
           <div>
-            {" "}
             <UserButton afterSignOutUrl="/" />
           </div>
         ) : (
