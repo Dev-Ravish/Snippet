@@ -1,7 +1,9 @@
 
 "use client";
 
+import { summaryEdenAi } from "@/actions/summary";
 import { Icons } from "@/components/icons";
+import SendSpeechDialog from "@/components/send-speed-dialog";
 // Import necessary modules and components
 import { useEffect, useState, useRef } from "react";
 
@@ -18,8 +20,10 @@ export default function MicrophoneComponent() {
   // State variables to manage recording status, completion, and transcript
   const [isRecording, setIsRecording] = useState(false);
   const [recordingComplete, setRecordingComplete] = useState(false);
-  const [val, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState("");
   const [result, setResult] = useState({});
+  const [showResult, setShowresult]=useState(false);
+  const [edenAiResult,setEdenAiResult]=useState("");
 
   // Reference to store the SpeechRecognition instance
   const recognitionRef = useRef<any>(null);
@@ -34,7 +38,6 @@ export default function MicrophoneComponent() {
 
     // Event handler for speech recognition results
     recognitionRef.current.onresult = (event: any) => {
-      const { transcript } = event.results[event.results.length - 1][0];
       // Log the recognition results and update the transcript state
       // console.log(event.results);
       setResult(event.results)
@@ -55,7 +58,7 @@ export default function MicrophoneComponent() {
   }, []);
 
   // Function to stop recording
-  const stopRecording = () => {
+  const stopRecording = async () => {
     console.log(result);
     const resultArray = Object.values(result) as Array<Array<{ transcript: string }>>;
 
@@ -66,7 +69,14 @@ export default function MicrophoneComponent() {
 
     console.log(concatenatedString);
     setTranscript(concatenatedString);
-
+    // eden ai call
+ const edenResp=await summaryEdenAi(concatenatedString)
+ if(edenResp.status){
+  setEdenAiResult(edenResp.result)
+  setShowresult(true)
+ }
+ console.log(edenResp)
+   
     if (recognitionRef.current) {
       // Stop the speech recognition and mark recording as complete
 
@@ -76,12 +86,13 @@ export default function MicrophoneComponent() {
   };
 
   // Toggle recording state and manage recording actions
-  const handleToggleRecording = () => {
+  const handleToggleRecording = async () => {
     setIsRecording(!isRecording);
     if (!isRecording) {
       startRecording();
     } else {
       stopRecording();
+      
     }
   };
 
@@ -89,7 +100,7 @@ export default function MicrophoneComponent() {
   return (
     <div className="flex items-center justify-center h-screen w-full">
       <div className="w-full">
-        {(isRecording || val) && (
+        {(isRecording || transcript) && (
           <div className="w-1/4 m-auto rounded-md border p-4 bg-white">
             <div className="flex-1 flex w-full justify-between">
               <div className="space-y-1">
@@ -107,15 +118,18 @@ export default function MicrophoneComponent() {
               )}
             </div>
 
-            {val && (
-              <div className="border rounded-md p-2 h-fullm mt-4">
-                <p className="mb-0">{val}</p>
+            {transcript && (
+              <div className="border rounded-md p-2 h-full mt-4">
+                <p className="mb-0">{transcript}</p>
               </div>
             )}
+            {
+              showResult && <SendSpeechDialog transcript={edenAiResult}/>
+            }
           </div>
         )}
 
-        <div className="flex items-center w-full">
+        <div className="flex items-center">
           {isRecording ? (
             // Button for stopping recording
             <button
