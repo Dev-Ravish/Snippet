@@ -5,7 +5,8 @@ import axios from "axios";
 export async function summaryEdenAi(transcript: string) {
   console.log(transcript);
   // let PromptText = `Generate summary notes based on the provided text input. Summarize the content into organized bullet points, highlighting key ideas, concepts, and relevant details. Ensure each bullet point is clear, succinct, and captures a distinct piece of information. you can divide each points by '\n-' ${transcript}`;
-  const PromptText=`Generate enhanced notes based on the provided text input. ${transcript}`
+  const PromptText=`Summarize the transcript in paragraph format with better wordings.
+  ${transcript}`
   const options = {
     method: "POST",
     url: "https://api.edenai.run/v2/text/summarize",
